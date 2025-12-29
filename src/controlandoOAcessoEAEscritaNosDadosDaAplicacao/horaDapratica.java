@@ -2,6 +2,9 @@ package controlandoOAcessoEAEscritaNosDadosDaAplicacao;
 
 public class horaDapratica {
     public static void main(String[] args) {
+        String pular ="""
+                --------------------
+                """;
         System.out.println("Exercício 1");
         Conta contaBancaria = new Conta();
 
@@ -15,6 +18,9 @@ public class horaDapratica {
 
         contaBancaria.setSaldo(1500);
         System.out.println("Novo Saldo: "+ contaBancaria.getSaldo());
+
+        System.out.println(pular);
+        System.out.println("Exercício 2");
 
     }
 }

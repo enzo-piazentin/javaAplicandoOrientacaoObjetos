@@ -5,7 +5,6 @@ public class Conta {
     private int numeroConta;
     public String titular;
 
-
     public double getSaldo(){
         return saldo;
     }
