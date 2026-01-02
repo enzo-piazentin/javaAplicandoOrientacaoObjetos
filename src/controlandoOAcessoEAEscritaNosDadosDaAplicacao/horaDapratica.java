@@ -22,5 +22,21 @@ public class horaDapratica {
         System.out.println(pular);
         System.out.println("Exercício 2");
 
+        IdadePessoa pessoa = new IdadePessoa();
+
+        pessoa.setNome("Enzo Ribeiro");
+        pessoa.setIdade(19);
+
+        System.out.println("Nome: " + pessoa.getNome());
+        System.out.println("Idade: " + pessoa.getIdade());
+        pessoa.verificaIdade();
+
+        pessoa.setNome("Mariana Perrella");
+        pessoa.setIdade(16);
+        System.out.println("Nome: " + pessoa.getNome());
+        System.out.println("Idade: " + pessoa.getIdade());
+        pessoa.verificaIdade();
+
+
     }
 }
