@@ -1,5 +1,4 @@
-// language: java
-package com.santander.aof.app.resource;
+
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
