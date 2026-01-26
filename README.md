@@ -1,94 +1,146 @@
+// java
+package com.santander.aof.app.resource;
 
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
-    @Mock
-    private SistService sistService;
+import com.santander.aof.app.service.SistService;
+import com.santander.aof.model.SistPageResponseDTO;
+import com.santander.aof.model.SistRequestDTO;
+import com.santander.aof.model.SistResponseDTO;
+import com.santander.aof.model.SistUpdatePatchRequestDTO;
+import com.santander.ars.error.exceptions.ValidationException;
+import java.util.concurrent.CompletableFuture;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.ResponseEntity;
 
-    private SistResource resource;
+@ExtendWith(MockitoExtension.class)
+class SistResourceTest {
 
-    @BeforeEach
-    void setUp() {
-        resource = new SistResource(sistService);
+    @Mock private SistService sistService;
+    @InjectMocks private SistResource sistResource;
+
+    @Test
+    @DisplayName("listar: deve retornar ResponseEntity.ok com o DTO do serviço")
+    void listarDeveRetornarOk() {
+        Integer page = 0;
+        Integer size = 10;
+        SistPageResponseDTO mockResponse = new SistPageResponseDTO();
+        when(sistService.listarSists(page, size)).thenReturn(mockResponse);
+
+        CompletableFuture<ResponseEntity<SistPageResponseDTO>> future = sistResource.sistGet(page, size);
+        ResponseEntity<SistPageResponseDTO> resp = future.join();
+
+        assertThat(resp).isEqualTo(ResponseEntity.ok(mockResponse));
+        verify(sistService, times(1)).listarSists(page, size);
     }
 
     @Test
-    @DisplayName("sistGet deve retornar 200 com body")
-    void sistGet_deveRetornarOkComBody() {
-        SistPageResponseDTO page = mock(SistPageResponseDTO.class);
-        when(sistService.listarSists(1, 10)).thenReturn(page);
+    @DisplayName("create: deve normalizar nome (trim) e retornar 201 com body")
+    void createDeveNormalizarEVoltar201() {
+        SistRequestDTO req = new SistRequestDTO();
+        req.setCodigoSistema("123");
+        req.setNomeSistema(" NomeSistema ");
+        req.setIndicadorSistemaAtivo("A");
 
-        ResponseEntity<SistPageResponseDTO> resp = resource.sistGet(1, 10).join();
+        SistResponseDTO svcResp = new SistResponseDTO();
+        when(sistService.createSist(any(SistRequestDTO.class))).thenReturn(svcResp);
 
-        assertEquals(HttpStatus.OK, resp.getStatusCode());
-        assertSame(page, resp.getBody());
-        verify(sistService).listarSists(1, 10);
-    }
+        CompletableFuture<ResponseEntity<SistResponseDTO>> future = sistResource.sistCreateSystemPost(req);
+        ResponseEntity<SistResponseDTO> resp = future.join();
 
-    @Test
-    @DisplayName("sistCreate deve retornar 201 e chamar service com DTO normalizado")
-    void sistCreate_deveRetornar201EChamarServiceComNormalizedDTO() {
-        SistRequestDTO incoming = mock(SistRequestDTO.class);
-        when(incoming.getCodigoSistema()).thenReturn("CD1");
-        when(incoming.getNomeSistema()).thenReturn("  My System  ");
-        when(incoming.getIndicadorSistemaAtivo()).thenReturn("A");
-
-        SistResponseDTO created = mock(SistResponseDTO.class);
-        when(sistService.createSist(any())).thenReturn(created);
-
-        ResponseEntity<SistResponseDTO> resp = resource.sistCreateSystemPost(incoming).join();
-
-        assertEquals(HttpStatus.CREATED, resp.getStatusCode());
-        assertSame(created, resp.getBody());
+        assertThat(resp.getStatusCodeValue()).isEqualTo(201);
+        assertThat(resp.getBody()).isSameAs(svcResp);
 
         ArgumentCaptor<SistRequestDTO> captor = ArgumentCaptor.forClass(SistRequestDTO.class);
         verify(sistService).createSist(captor.capture());
-        SistRequestDTO normalized = captor.getValue();
-        assertEquals("CD1", normalized.getCodigoSistema());
-        assertEquals("My System", normalized.getNomeSistema());
-        assertEquals("A", normalized.getIndicadorSistemaAtivo());
+        SistRequestDTO sent = captor.getValue();
+        assertThat(sent.getNomeSistema()).isEqualTo("NomeSistema");
+        assertThat(sent.getIndicadorSistemaAtivo()).isEqualTo("A");
+        assertThat(sent.getCodigoSistema()).isEqualTo("123");
     }
 
     @Test
-    @DisplayName("sistCreate deve lançar ValidationException quando request for nulo")
-    void sistCreate_deveLancarValidationExceptionQuandoRequestNull() {
-        CompletionException thrown = assertThrows(
-                CompletionException.class, () -> resource.sistCreateSystemPost(null).join());
-        assertTrue(thrown.getCause() instanceof ValidationException);
+    @DisplayName("create: deve lançar ValidationException quando payload for nulo")
+    void createDeveLancarQuandoPayloadNulo() {
+        CompletableFuture<ResponseEntity<SistResponseDTO>> future = sistResource.sistCreateSystemPost(null);
+
+        assertThatThrownBy(future::join)
+                .hasCauseInstanceOf(ValidationException.class);
+        verify(sistService, never()).createSist(any());
     }
 
     @Test
-    @DisplayName("sistUpdate deve retornar 200 e chamar service com patch normalizado")
-    void sistUpdate_deveRetornarOkEChamarServiceComNormalizedPatch() {
-        SistUpdatePatchRequestDTO incoming = mock(SistUpdatePatchRequestDTO.class);
-        when(incoming.getCodigoSistema()).thenReturn("CD1");
-        when(incoming.getNomeSistema()).thenReturn("  NomePatch  ");
-        when(incoming.getIndicadorSistemaAtivo()).thenReturn("a"); // should be uppercased
+    @DisplayName("create: deve lançar ValidationException quando nome em branco")
+    void createDeveLancarQuandoNomeVazio() {
+        SistRequestDTO req = new SistRequestDTO();
+        req.setCodigoSistema("1");
+        req.setNomeSistema("   ");
+        req.setIndicadorSistemaAtivo("A");
 
-        SistResponseDTO patched = mock(SistResponseDTO.class);
-        when(sistService.updateSist(any())).thenReturn(patched);
+        CompletableFuture<ResponseEntity<SistResponseDTO>> future = sistResource.sistCreateSystemPost(req);
 
-        ResponseEntity<SistResponseDTO> resp = resource.sistUpdateSystemPatch(incoming).join();
+        assertThatThrownBy(future::join)
+                .hasCauseInstanceOf(ValidationException.class)
+                .hasMessageContaining("Descrição do Sistema");
+    }
 
-        assertEquals(HttpStatus.OK, resp.getStatusCode());
-        assertSame(patched, resp.getBody());
+    @Test
+    @DisplayName("patch: deve normalizar nome (trim) e indicador (upper) e retornar 200")
+    void patchDeveNormalizarEVoltar200() {
+        SistUpdatePatchRequestDTO req = new SistUpdatePatchRequestDTO();
+        req.setCodigoSistema("10");
+        req.setNomeSistema(" NomeX ");
+        req.setIndicadorSistemaAtivo(" i ");
+
+        SistResponseDTO svcResp = new SistResponseDTO();
+        when(sistService.updateSist(any(SistUpdatePatchRequestDTO.class))).thenReturn(svcResp);
+
+        CompletableFuture<ResponseEntity<SistResponseDTO>> future = sistResource.sistUpdateSystemPatch(req);
+        ResponseEntity<SistResponseDTO> resp = future.join();
+
+        assertThat(resp.getStatusCodeValue()).isEqualTo(200);
+        assertThat(resp.getBody()).isSameAs(svcResp);
 
         ArgumentCaptor<SistUpdatePatchRequestDTO> captor = ArgumentCaptor.forClass(SistUpdatePatchRequestDTO.class);
         verify(sistService).updateSist(captor.capture());
-        SistUpdatePatchRequestDTO normalized = captor.getValue();
-        assertEquals("CD1", normalized.getCodigoSistema());
-        assertEquals("NomePatch", normalized.getNomeSistema());
-        assertEquals("A", normalized.getIndicadorSistemaAtivo());
+        SistUpdatePatchRequestDTO sent = captor.getValue();
+        assertThat(sent.getCodigoSistema()).isEqualTo("10");
+        assertThat(sent.getNomeSistema()).isEqualTo("NomeX");
+        assertThat(sent.getIndicadorSistemaAtivo()).isEqualTo("I");
     }
 
     @Test
-    @DisplayName("sistUpdate deve lançar ValidationException quando nenhum campo preenchido")
-    void sistUpdate_deveLancarValidationExceptionQuandoNenhumCampoPreenchido() {
-        SistUpdatePatchRequestDTO incoming = mock(SistUpdatePatchRequestDTO.class);
-        when(incoming.getCodigoSistema()).thenReturn("CD1");
-        when(incoming.getNomeSistema()).thenReturn(null);
-        when(incoming.getIndicadorSistemaAtivo()).thenReturn(null);
+    @DisplayName("patch: deve lançar ValidationException quando nenhum campo preenchido")
+    void patchDeveLancarQuandoNenhumCampoPreenchido() {
+        SistUpdatePatchRequestDTO req = new SistUpdatePatchRequestDTO();
+        req.setCodigoSistema("5"); // código presente, mas sem nome e indicador
 
-        CompletionException thrown = assertThrows(
-                CompletionException.class, () -> resource.sistUpdateSystemPatch(incoming).join());
-        assertTrue(thrown.getCause() instanceof ValidationException);
+        CompletableFuture<ResponseEntity<SistResponseDTO>> future = sistResource.sistUpdateSystemPatch(req);
+
+        assertThatThrownBy(future::join)
+                .hasCauseInstanceOf(ValidationException.class);
+        verify(sistService, never()).updateSist(any());
+    }
+
+    @Test
+    @DisplayName("patch: deve lançar ValidationException quando indicador inválido")
+    void patchDeveLancarQuandoIndicadorInvalido() {
+        SistUpdatePatchRequestDTO req = new SistUpdatePatchRequestDTO();
+        req.setCodigoSistema("7");
+        req.setIndicadorSistemaAtivo("X");
+
+        CompletableFuture<ResponseEntity<SistResponseDTO>> future = sistResource.sistUpdateSystemPatch(req);
+
+        assertThatThrownBy(future::join)
+                .hasCauseInstanceOf(ValidationException.class);
+        verify(sistService, never()).updateSist(any());
     }
 }
