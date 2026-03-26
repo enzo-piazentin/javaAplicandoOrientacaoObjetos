@@ -1,4 +1,4 @@
-package reaproveitandoCaracteristicasEComportamento;
+package reaproveitandoCaracteristicasEComportamento.exercicio4;
 
 public class VerificandoPrimo extends  NumerosPrimos{
 

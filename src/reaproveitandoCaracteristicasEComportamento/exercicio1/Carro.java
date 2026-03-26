@@ -1,4 +1,4 @@
-package reaproveitandoCaracteristicasEComportamento;
+package reaproveitandoCaracteristicasEComportamento.exercicio1;
 
 public class Carro {
     private String modelo;

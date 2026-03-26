@@ -1,4 +1,4 @@
-package modeloOScreenMatch.horaDaPratica;
+package modeloOScreenMatch;
 
 public class Calculadora {
     int numero, dobroDoNumero;

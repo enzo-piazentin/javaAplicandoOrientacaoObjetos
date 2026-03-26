@@ -1,9 +1,9 @@
-package reaproveitandoCaracteristicasEComportamento;
+package reaproveitandoCaracteristicasEComportamento.exercicio2;
 
 public class Gato extends Animal {
 
     @Override
-    void emitirSom() {
+    public void emitirSom() {
         System.out.println("Miau miau");
     }
 }

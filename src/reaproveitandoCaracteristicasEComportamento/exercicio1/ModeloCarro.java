@@ -1,4 +1,4 @@
-package reaproveitandoCaracteristicasEComportamento;
+package reaproveitandoCaracteristicasEComportamento.exercicio1;
 
 public class ModeloCarro extends Carro{
     private String marca, cor, tipoCombustivel;

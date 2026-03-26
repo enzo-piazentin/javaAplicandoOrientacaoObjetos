@@ -1,5 +1,11 @@
 package controlandoOAcessoEAEscritaNosDadosDaAplicacao;
 
+import controlandoOAcessoEAEscritaNosDadosDaAplicacao.exercicio1.Conta;
+import controlandoOAcessoEAEscritaNosDadosDaAplicacao.exercicio2.IdadePessoa;
+import controlandoOAcessoEAEscritaNosDadosDaAplicacao.exercicio3.produto;
+import controlandoOAcessoEAEscritaNosDadosDaAplicacao.exercicio4.aluno;
+import controlandoOAcessoEAEscritaNosDadosDaAplicacao.exercicio5.livro;
+
 public class horaDapratica {
     public static void main(String[] args) {
         String pular ="""

@@ -1,4 +1,4 @@
-package modeloOScreenMatch.horaDaPratica;
+package modeloOScreenMatch;
 
 public class aluno {
     String aluno, sala;

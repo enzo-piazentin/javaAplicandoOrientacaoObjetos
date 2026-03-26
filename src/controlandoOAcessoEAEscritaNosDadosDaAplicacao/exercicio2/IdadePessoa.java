@@ -1,4 +1,4 @@
-package controlandoOAcessoEAEscritaNosDadosDaAplicacao;
+package controlandoOAcessoEAEscritaNosDadosDaAplicacao.exercicio2;
 
 public class IdadePessoa {
     private int idade;

@@ -1,12 +1,19 @@
 package reaproveitandoCaracteristicasEComportamento;
 
+import reaproveitandoCaracteristicasEComportamento.exercicio2.Cachorro;
+import reaproveitandoCaracteristicasEComportamento.exercicio2.Gato;
+import reaproveitandoCaracteristicasEComportamento.exercicio3.ContaCorrente;
+import reaproveitandoCaracteristicasEComportamento.exercicio4.GerandoPrimo;
+import reaproveitandoCaracteristicasEComportamento.exercicio4.NumerosPrimos;
+import reaproveitandoCaracteristicasEComportamento.exercicio4.VerificandoPrimo;
+
 public class horaDaPratica {
     public static void main(String[] args) {
         Cachorro cachorro = new Cachorro();
         Gato gato = new Gato();
 
-        gato.emitirSom();
         cachorro.emitirSom();
+        gato.emitirSom();
 
         System.out.println("--------------------------------------");
         System.out.println(" ");

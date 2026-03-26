@@ -1,4 +1,4 @@
-package reaproveitandoCaracteristicasEComportamento;
+package reaproveitandoCaracteristicasEComportamento.exercicio3;
 
 public class ContaBancaria {
     private double saldo;

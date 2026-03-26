@@ -1,4 +1,4 @@
-package modeloOScreenMatch.horaDaPratica;
+package modeloOScreenMatch;
 
 import java.util.Scanner;
 

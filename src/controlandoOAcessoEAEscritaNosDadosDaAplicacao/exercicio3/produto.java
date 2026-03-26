@@ -1,4 +1,4 @@
-package controlandoOAcessoEAEscritaNosDadosDaAplicacao;
+package controlandoOAcessoEAEscritaNosDadosDaAplicacao.exercicio3;
 
 public class produto {
     private String nomeProduto;
